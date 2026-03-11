@@ -4,7 +4,7 @@
     "description": "Dynamic online learning application",
     "scripts": {
         "start": "node server/server.js",
-        "build": "cd client && npm install && npm run build && cd ../server && npm install",
+        "build": "bash build.sh",
         "server": "npm run dev --prefix server",
         "client": "npm run dev --prefix client",
         "dev": "concurrently \"npm run server\" \"npm run client\""
