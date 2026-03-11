@@ -38,21 +38,24 @@ if (process.env.NODE_ENV === 'production') {
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/onlinelearning';
 
+// Bind to port immediately so hosting provider (Render) knows we are alive
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+    
+    // Auto-ping logic for free hosting (Render/Railway)
+    if (process.env.RENDER_EXTERNAL_URL) {
+      setInterval(() => {
+        axios.get(process.env.RENDER_EXTERNAL_URL)
+          .then(() => console.log('Auto-ping successful'))
+          .catch(err => console.error('Auto-ping failed:', err.message));
+      }, 14 * 60 * 1000); // Ping every 14 minutes
+    }
+});
+
+// Connect to Database
 mongoose.connect(MONGO_URI)
   .then(() => {
     console.log('Connected to MongoDB');
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-      
-      // Auto-ping logic for free hosting (Render/Railway)
-      if (process.env.RENDER_EXTERNAL_URL) {
-        setInterval(() => {
-          axios.get(process.env.RENDER_EXTERNAL_URL)
-            .then(() => console.log('Auto-ping successful'))
-            .catch(err => console.error('Auto-ping failed:', err.message));
-        }, 14 * 60 * 1000); // Ping every 14 minutes
-      }
-    });
   })
   .catch((err) => {
     console.error('MongoDB connection error:', err);
