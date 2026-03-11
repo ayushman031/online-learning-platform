@@ -3,6 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const axios = require('axios'); // Added for auto-ping
 
 const authRoutes = require('./routes/auth');
 const courseRoutes = require('./routes/courses');
@@ -41,6 +42,15 @@ mongoose.connect(MONGO_URI)
     console.log('Connected to MongoDB');
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
+      
+      // Auto-ping logic for free hosting (Render/Railway)
+      if (process.env.RENDER_EXTERNAL_URL) {
+        setInterval(() => {
+          axios.get(process.env.RENDER_EXTERNAL_URL)
+            .then(() => console.log('Auto-ping successful'))
+            .catch(err => console.error('Auto-ping failed:', err.message));
+        }, 14 * 60 * 1000); // Ping every 14 minutes
+      }
     });
   })
   .catch((err) => {
